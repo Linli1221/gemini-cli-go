@@ -9,13 +9,14 @@ import (
 	"sync"
 	"time"
 
+	"gemini-cli-go/internal/config"
 	"gemini-cli-go/internal/constants"
 	"gemini-cli-go/internal/types"
 )
 
 // AuthManager handles OAuth2 authentication and Google Code Assist API communication
 type AuthManager struct {
-	config *types.Config
+	config *config.Config
 	accessToken string
 	mu          sync.RWMutex
 	cache       map[string]*types.CachedTokenData
@@ -23,7 +24,7 @@ type AuthManager struct {
 }
 
 // NewAuthManager creates a new AuthManager instance
-func NewAuthManager(config *types.Config) *AuthManager {
+func NewAuthManager(config *config.Config) *AuthManager {
 	return &AuthManager{
 		config: config,
 		cache:  make(map[string]*types.CachedTokenData),
