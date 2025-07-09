@@ -83,9 +83,8 @@ func (a *AuthManager) refreshAndCacheToken(refreshToken string) error {
 		"refresh_token": {refreshToken},
 		"grant_type":    {"refresh_token"},
 	}
-
 	// Create HTTP client with TLS configuration
-	client := a.createHTTPClient()
+	client := a.CreateHTTPClient()
 
 	resp, err := client.PostForm(constants.OAuthRefreshURL, data)
 	if err != nil {
@@ -200,7 +199,7 @@ func (a *AuthManager) callEndpointWithRetry(method string, body interface{}, isR
 	req.Header.Set("Content-Type", constants.ContentTypeJSON)
 	req.Header.Set("Authorization", constants.BearerPrefix+token)
 
-	client := a.createHTTPClient()
+	client := a.CreateHTTPClient()
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -280,8 +279,8 @@ func (a *AuthManager) GetAuthenticationStatus() map[string]interface{} {
 	return status
 }
 
-// createHTTPClient creates an HTTP client with appropriate TLS configuration
-func (a *AuthManager) createHTTPClient() *http.Client {
+// CreateHTTPClient creates an HTTP client with appropriate TLS configuration
+func (a *AuthManager) CreateHTTPClient() *http.Client {
 	transport := &http.Transport{
 		TLSClientConfig: &tls.Config{},
 	}

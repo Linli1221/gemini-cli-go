@@ -72,12 +72,12 @@ type ImageURL struct {
 
 // ChatCompletionResponse represents an OpenAI chat completion response
 type ChatCompletionResponse struct {
-	ID      string                   `json:"id"`
-	Object  string                   `json:"object"`
-	Created int64                    `json:"created"`
-	Model   string                   `json:"model"`
-	Choices []ChatCompletionChoice   `json:"choices"`
-	Usage   *ChatCompletionUsage     `json:"usage,omitempty"`
+	ID      string                 `json:"id"`
+	Object  string                 `json:"object"`
+	Created int64                  `json:"created"`
+	Model   string                 `json:"model"`
+	Choices []ChatCompletionChoice `json:"choices"`
+	Usage   *ChatCompletionUsage   `json:"usage,omitempty"`
 }
 
 // ChatCompletionChoice represents a choice in a chat completion response
@@ -129,11 +129,11 @@ type StreamChunk struct {
 type StreamChunkType string
 
 const (
-	StreamChunkTypeText          StreamChunkType = "text"
-	StreamChunkTypeUsage         StreamChunkType = "usage"
-	StreamChunkTypeReasoning     StreamChunkType = "reasoning"
+	StreamChunkTypeText            StreamChunkType = "text"
+	StreamChunkTypeUsage           StreamChunkType = "usage"
+	StreamChunkTypeReasoning       StreamChunkType = "reasoning"
 	StreamChunkTypeThinkingContent StreamChunkType = "thinking_content"
-	StreamChunkTypeRealThinking  StreamChunkType = "real_thinking"
+	StreamChunkTypeRealThinking    StreamChunkType = "real_thinking"
 )
 
 // TokenRefreshResponse represents a token refresh response
@@ -152,13 +152,13 @@ type CachedTokenData struct {
 
 // TokenCacheInfo represents token cache information
 type TokenCacheInfo struct {
-	Cached               bool      `json:"cached"`
-	CachedAt             time.Time `json:"cached_at,omitempty"`
-	ExpiresAt            time.Time `json:"expires_at,omitempty"`
-	TimeUntilExpirySeconds int     `json:"time_until_expiry_seconds,omitempty"`
-	IsExpired            bool      `json:"is_expired,omitempty"`
-	Message              string    `json:"message,omitempty"`
-	Error                string    `json:"error,omitempty"`
+	Cached                 bool      `json:"cached"`
+	CachedAt               time.Time `json:"cached_at,omitempty"`
+	ExpiresAt              time.Time `json:"expires_at,omitempty"`
+	TimeUntilExpirySeconds int       `json:"time_until_expiry_seconds,omitempty"`
+	IsExpired              bool      `json:"is_expired,omitempty"`
+	Message                string    `json:"message,omitempty"`
+	Error                  string    `json:"error,omitempty"`
 }
 
 // GeminiResponse represents a response from the Gemini API
@@ -247,12 +247,12 @@ type ServiceInfo struct {
 
 // ServiceInfoResponse represents the response for the service info endpoint
 type ServiceInfoResponse struct {
-	Name           string                 `json:"name"`
-	Description    string                 `json:"description"`
-	Version        string                 `json:"version"`
-	Authentication AuthInfo               `json:"authentication"`
-	Endpoints      EndpointInfo           `json:"endpoints"`
-	Documentation  string                 `json:"documentation"`
+	Name           string       `json:"name"`
+	Description    string       `json:"description"`
+	Version        string       `json:"version"`
+	Authentication AuthInfo     `json:"authentication"`
+	Endpoints      EndpointInfo `json:"endpoints"`
+	Documentation  string       `json:"documentation"`
 }
 
 // AuthInfo represents authentication information

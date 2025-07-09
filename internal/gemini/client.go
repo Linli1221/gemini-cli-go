@@ -31,9 +31,7 @@ func NewClient(config *types.Environment, authManager *auth.AuthManager) *Client
 	return &Client{
 		authManager: authManager,
 		config:      config,
-		httpClient: &http.Client{
-			Timeout: time.Duration(config.RequestTimeout) * time.Second,
-		},
+		httpClient:  authManager.CreateHTTPClient(),
 	}
 }
 
@@ -320,7 +318,7 @@ func (c *Client) createGenerationConfig(modelID string, options *StreamOptions) 
 			if options.ThinkingBudget != nil {
 				thinkingBudget = *options.ThinkingBudget
 			}
-			
+
 			// Validate thinking budget (can't be 0 for thinking models)
 			if thinkingBudget == 0 {
 				thinkingBudget = constants.DefaultThinkingBudget
@@ -408,7 +406,7 @@ func (c *Client) parseSSEStream(ctx context.Context, chunkChan chan<- types.Stre
 		}
 
 		line := scanner.Text()
-		
+
 		if line == "" {
 			if buffer.Len() > 0 {
 				if err := c.processSSEData(chunkChan, buffer.String(), options, &hasStartedThinking, &hasClosedThinking); err != nil {
@@ -543,7 +541,7 @@ func (c *Client) generateFakeThinking(ctx context.Context, chunkChan chan<- type
 
 		for _, template := range constants.ReasoningMessages {
 			message := strings.ReplaceAll(template, "{requestPreview}", requestPreview)
-			
+
 			// Split into chunks
 			chunks := c.splitIntoChunks(message, constants.ThinkingContentChunkSize)
 			for _, chunk := range chunks {
