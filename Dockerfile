@@ -16,6 +16,9 @@ RUN go mod download
 # 复制源代码
 COPY . .
 
+# 同步依赖
+RUN go mod tidy
+
 # 构建应用
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o gemini-cli-go .
 
