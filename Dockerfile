@@ -1,37 +1,24 @@
-# 使用官方 Go 镜像作为构建环境
-FROM golang:1.21-alpine AS builder
-
-# 设置工作目录
+# Dockerfile for gemini-cli-go
+# Build stage
+FROM golang:1.20-alpine AS builder
 WORKDIR /app
 
-# 安装必要的包
-RUN apk add --no-cache git
-
-# 复制 go mod 文件
+# Cache Go modules
 COPY go.mod go.sum ./
-
-# 下载依赖
 RUN go mod download
 
-# 复制源代码
+# Copy source code
 COPY . .
 
-# 构建应用
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o gemini-cli-go .
+# Build the binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o gemini-cli-go .
 
-# 使用更小的镜像运行应用
-FROM alpine:latest
+# Final stage
+FROM scratch
+WORKDIR /
 
-# 安装 ca-certificates 用于 HTTPS 请求
-RUN apk --no-cache add ca-certificates
+# Copy binary from builder
+COPY --from=builder /app/gemini-cli-go /gemini-cli-go
 
-WORKDIR /root/
-
-# 从构建阶段复制二进制文件
-COPY --from=builder /app/gemini-cli-go .
-
-# 暴露端口
-EXPOSE 8080
-
-# 运行应用
-CMD ["./gemini-cli-go"]
+# Entrypoint
+ENTRYPOINT ["/gemini-cli-go"]
