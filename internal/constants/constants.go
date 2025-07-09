@@ -15,10 +15,10 @@ const (
 
 	// OpenAI API Constants
 	OpenAIChatCompletionObject = "chat.completion.chunk"
-	OpenAIModelOwner          = "google-gemini-cli"
-	OpenAICompletionObject    = "chat.completion"
-	OpenAIModelObject         = "model"
-	OpenAIModelListObject     = "list"
+	OpenAIModelOwner           = "google-gemini-cli"
+	OpenAICompletionObject     = "chat.completion"
+	OpenAIModelObject          = "model"
+	OpenAIModelListObject      = "list"
 
 	// Default values
 	DefaultModel       = "gemini-2.5-flash"
@@ -27,7 +27,7 @@ const (
 	DefaultTemperature = 0.7
 
 	// Token management
-	TokenBufferTime       = 5 * time.Minute
+	TokenBufferTime         = 5 * time.Minute
 	DefaultTokenCacheExpiry = 3600 // seconds
 	DefaultRequestTimeout   = 30   // seconds
 
@@ -36,19 +36,19 @@ const (
 	DisabledThinkingBudget = 0  // 0 disables thinking entirely
 
 	// Streaming constants
-	ReasoningChunkDelay         = 100 * time.Millisecond
-	ThinkingContentChunkSize    = 15
-	StreamingChunkDelay         = 50 * time.Millisecond
-	SSEDataPrefix              = "data: "
-	SSEDoneMessage             = "data: [DONE]"
-	SSENewLine                 = "\n"
+	ReasoningChunkDelay      = 100 * time.Millisecond
+	ThinkingContentChunkSize = 15
+	StreamingChunkDelay      = 50 * time.Millisecond
+	SSEDataPrefix            = "data: "
+	SSEDoneMessage           = "data: [DONE]"
+	SSENewLine               = "\n"
 
 	// HTTP headers
-	ContentTypeJSON        = "application/json"
-	ContentTypeSSE         = "text/event-stream"
+	ContentTypeJSON           = "application/json"
+	ContentTypeSSE            = "text/event-stream"
 	ContentTypeFormURLEncoded = "application/x-www-form-urlencoded"
-	AuthorizationHeader    = "Authorization"
-	BearerPrefix          = "Bearer "
+	AuthorizationHeader       = "Authorization"
+	BearerPrefix              = "Bearer "
 
 	// CORS headers
 	CORSAllowOrigin  = "*"
@@ -60,31 +60,32 @@ const (
 	ConnectionKeepAlive = "keep-alive"
 
 	// Model context windows and limits
-	MaxTokensDefault    = 65536
+	MaxTokensDefault     = 65536
 	ContextWindowDefault = 1048576
 
 	// Environment variable names
-	EnvGCPServiceAccount      = "GCP_SERVICE_ACCOUNT"
-	EnvGeminiProjectID        = "GEMINI_PROJECT_ID"
-	EnvOpenAIAPIKey           = "OPENAI_API_KEY"
-	EnvEnableFakeThinking     = "ENABLE_FAKE_THINKING"
-	EnvEnableRealThinking     = "ENABLE_REAL_THINKING"
+	EnvGCPServiceAccount       = "GCP_SERVICE_ACCOUNT"
+	EnvGeminiProjectID         = "GEMINI_PROJECT_ID"
+	EnvOpenAIAPIKey            = "OPENAI_API_KEY"
+	EnvEnableFakeThinking      = "ENABLE_FAKE_THINKING"
+	EnvEnableRealThinking      = "ENABLE_REAL_THINKING"
 	EnvStreamThinkingAsContent = "STREAM_THINKING_AS_CONTENT"
-	EnvPort                   = "PORT"
-	EnvLogLevel               = "LOG_LEVEL"
-	EnvTokenCacheExpiry       = "TOKEN_CACHE_EXPIRY"
-	EnvRequestTimeout         = "REQUEST_TIMEOUT"
+	EnvPort                    = "PORT"
+	EnvLogLevel                = "LOG_LEVEL"
+	EnvTokenCacheExpiry        = "TOKEN_CACHE_EXPIRY"
+	EnvRequestTimeout          = "REQUEST_TIMEOUT"
+	EnvSkipTLSVerify           = "SKIP_TLS_VERIFY"
 
 	// API paths
-	PathV1           = "/v1"
-	PathModels       = "/models"
+	PathV1              = "/v1"
+	PathModels          = "/models"
 	PathChatCompletions = "/chat/completions"
-	PathDebug        = "/debug"
-	PathDebugCache   = "/debug/cache"
-	PathTokenTest    = "/token-test"
-	PathTest         = "/test"
-	PathHealth       = "/health"
-	PathRoot         = "/"
+	PathDebug           = "/debug"
+	PathDebugCache      = "/debug/cache"
+	PathTokenTest       = "/token-test"
+	PathTest            = "/test"
+	PathHealth          = "/health"
+	PathRoot            = "/"
 
 	// Error messages
 	ErrMissingGCPServiceAccount = "GCP_SERVICE_ACCOUNT environment variable not set"
@@ -100,10 +101,10 @@ const (
 	ErrInvalidRequest           = "Invalid request"
 
 	// Success messages
-	MsgHealthOK            = "OK"
-	MsgAuthenticationOK    = "Authentication successful"
-	MsgTokenRefreshed      = "Token refreshed successfully"
-	MsgProjectDiscovered   = "Project ID discovered successfully"
+	MsgHealthOK          = "OK"
+	MsgAuthenticationOK  = "Authentication successful"
+	MsgTokenRefreshed    = "Token refreshed successfully"
+	MsgProjectDiscovered = "Project ID discovered successfully"
 
 	// Thinking tags
 	ThinkingOpenTag  = "<thinking>\n"
@@ -111,7 +112,7 @@ const (
 
 	// Request/Response IDs
 	ChatCompletionIDPrefix = "chatcmpl-"
-	
+
 	// Retry settings
 	MaxRetries = 3
 	RetryDelay = 1 * time.Second

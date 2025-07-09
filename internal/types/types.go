@@ -4,16 +4,17 @@ import "time"
 
 // Environment represents the application environment configuration
 type Environment struct {
-	GCPServiceAccount      string `json:"gcp_service_account"`
-	GeminiProjectID        string `json:"gemini_project_id"`
-	OpenAIAPIKey           string `json:"openai_api_key"`
-	EnableFakeThinking     string `json:"enable_fake_thinking"`
-	EnableRealThinking     string `json:"enable_real_thinking"`
+	GCPServiceAccount       string `json:"gcp_service_account"`
+	GeminiProjectID         string `json:"gemini_project_id"`
+	OpenAIAPIKey            string `json:"openai_api_key"`
+	EnableFakeThinking      string `json:"enable_fake_thinking"`
+	EnableRealThinking      string `json:"enable_real_thinking"`
 	StreamThinkingAsContent string `json:"stream_thinking_as_content"`
-	Port                   string `json:"port"`
-	LogLevel               string `json:"log_level"`
-	TokenCacheExpiry       int    `json:"token_cache_expiry"`
-	RequestTimeout         int    `json:"request_timeout"`
+	Port                    string `json:"port"`
+	LogLevel                string `json:"log_level"`
+	TokenCacheExpiry        int    `json:"token_cache_expiry"`
+	RequestTimeout          int    `json:"request_timeout"`
+	SkipTLSVerify           string `json:"skip_tls_verify"`
 }
 
 // OAuth2Credentials represents OAuth2 credentials from Gemini CLI

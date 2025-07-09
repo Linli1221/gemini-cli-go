@@ -2,10 +2,13 @@ package auth
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
+	"os"
+	"strings"
 	"sync"
 	"time"
 
@@ -56,13 +59,13 @@ func (a *AuthManager) InitializeAuth() error {
 	// Check if the original token is still valid
 	expiryTime := time.Unix(oauth2Creds.ExpiryDate/1000, 0)
 	timeUntilExpiry := time.Until(expiryTime)
-	
+
 	if timeUntilExpiry > constants.TokenBufferTime {
 		// Original token is still valid, cache it and use it
 		a.mu.Lock()
 		a.accessToken = oauth2Creds.AccessToken
 		a.mu.Unlock()
-		
+
 		// Cache the token
 		a.cacheToken(oauth2Creds.AccessToken, expiryTime)
 		return nil
@@ -81,7 +84,10 @@ func (a *AuthManager) refreshAndCacheToken(refreshToken string) error {
 		"grant_type":    {"refresh_token"},
 	}
 
-	resp, err := http.PostForm(constants.OAuthRefreshURL, data)
+	// Create HTTP client with TLS configuration
+	client := a.createHTTPClient()
+
+	resp, err := client.PostForm(constants.OAuthRefreshURL, data)
 	if err != nil {
 		return fmt.Errorf("%s: %w", constants.ErrTokenRefreshFailed, err)
 	}
@@ -102,10 +108,10 @@ func (a *AuthManager) refreshAndCacheToken(refreshToken string) error {
 
 	// Calculate expiry time (typically 1 hour from now)
 	expiryTime := time.Now().Add(time.Duration(refreshData.ExpiresIn) * time.Second)
-	
+
 	// Cache the new token
 	a.cacheToken(refreshData.AccessToken, expiryTime)
-	
+
 	return nil
 }
 
@@ -113,7 +119,7 @@ func (a *AuthManager) refreshAndCacheToken(refreshToken string) error {
 func (a *AuthManager) cacheToken(accessToken string, expiryTime time.Time) {
 	a.cacheMu.Lock()
 	defer a.cacheMu.Unlock()
-	
+
 	a.cache["oauth_token"] = &types.CachedTokenData{
 		AccessToken: accessToken,
 		ExpiryDate:  expiryTime,
@@ -125,7 +131,7 @@ func (a *AuthManager) cacheToken(accessToken string, expiryTime time.Time) {
 func (a *AuthManager) getCachedToken() *types.CachedTokenData {
 	a.cacheMu.RLock()
 	defer a.cacheMu.RUnlock()
-	
+
 	if token, exists := a.cache["oauth_token"]; exists {
 		if time.Now().Before(token.ExpiryDate) {
 			return token
@@ -147,7 +153,7 @@ func (a *AuthManager) ClearTokenCache() {
 func (a *AuthManager) GetCachedTokenInfo() *types.TokenCacheInfo {
 	a.cacheMu.RLock()
 	defer a.cacheMu.RUnlock()
-	
+
 	if token, exists := a.cache["oauth_token"]; exists {
 		timeUntilExpiry := time.Until(token.ExpiryDate)
 		return &types.TokenCacheInfo{
@@ -158,7 +164,7 @@ func (a *AuthManager) GetCachedTokenInfo() *types.TokenCacheInfo {
 			IsExpired:              timeUntilExpiry <= 0,
 		}
 	}
-	
+
 	return &types.TokenCacheInfo{
 		Cached:  false,
 		Message: "No token found in cache",
@@ -194,9 +200,7 @@ func (a *AuthManager) callEndpointWithRetry(method string, body interface{}, isR
 	req.Header.Set("Content-Type", constants.ContentTypeJSON)
 	req.Header.Set("Authorization", constants.BearerPrefix+token)
 
-	client := &http.Client{
-		Timeout: time.Duration(a.config.RequestTimeout) * time.Second,
-	}
+	client := a.createHTTPClient()
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -210,7 +214,7 @@ func (a *AuthManager) callEndpointWithRetry(method string, body interface{}, isR
 		a.mu.Lock()
 		a.accessToken = ""
 		a.mu.Unlock()
-		
+
 		if err := a.InitializeAuth(); err != nil {
 			return nil, err
 		}
@@ -274,4 +278,36 @@ func (a *AuthManager) GetAuthenticationStatus() map[string]interface{} {
 	}
 
 	return status
+}
+
+// createHTTPClient creates an HTTP client with appropriate TLS configuration
+func (a *AuthManager) createHTTPClient() *http.Client {
+	transport := &http.Transport{
+		TLSClientConfig: &tls.Config{},
+	}
+
+	// Check for insecure TLS environment variable or configuration
+	if a.shouldSkipTLSVerify() {
+		transport.TLSClientConfig.InsecureSkipVerify = true
+	}
+
+	return &http.Client{
+		Transport: transport,
+		Timeout:   time.Duration(a.config.RequestTimeout) * time.Second,
+	}
+}
+
+// shouldSkipTLSVerify determines if TLS verification should be skipped
+func (a *AuthManager) shouldSkipTLSVerify() bool {
+	// Check configuration first
+	if a.config.SkipTLSVerify != "" {
+		return strings.ToLower(a.config.SkipTLSVerify) == "true" || a.config.SkipTLSVerify == "1"
+	}
+
+	// Check environment variable as fallback
+	if insecure := os.Getenv("SKIP_TLS_VERIFY"); insecure != "" {
+		return strings.ToLower(insecure) == "true" || insecure == "1"
+	}
+
+	return false
 }

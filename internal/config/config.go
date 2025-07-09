@@ -34,6 +34,7 @@ func New() (*Config, error) {
 			LogLevel:                getEnv(constants.EnvLogLevel, constants.DefaultLogLevel),
 			TokenCacheExpiry:        getEnvAsInt(constants.EnvTokenCacheExpiry, constants.DefaultTokenCacheExpiry),
 			RequestTimeout:          getEnvAsInt(constants.EnvRequestTimeout, constants.DefaultRequestTimeout),
+			SkipTLSVerify:           getEnv(constants.EnvSkipTLSVerify, "false"),
 		},
 	}
 
@@ -53,7 +54,7 @@ func (c *Config) Validate() error {
 		constants.LogLevelWarn,
 		constants.LogLevelError,
 	}
-	
+
 	if !contains(validLogLevels, c.Environment.LogLevel) {
 		c.Environment.LogLevel = constants.DefaultLogLevel
 	}
