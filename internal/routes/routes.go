@@ -29,12 +29,12 @@ func SetupRoutes(cfg *config.Config) *gin.Engine {
 	engine.Use(middleware.BasicRateLimitMiddleware(100, time.Minute))
 
 	// Create auth manager and Gemini client
-	authManager := auth.NewAuthManager(cfg)
-	geminiClient := gemini.NewClient(cfg, authManager)
+	authManager := auth.NewAuthManager(&cfg.Environment)
+	geminiClient := gemini.NewClient(&cfg.Environment, authManager)
 
 	// Create handlers
-	openaiHandler := handlers.NewOpenAIHandler(cfg, authManager, geminiClient)
-	debugHandler := handlers.NewDebugHandler(cfg, authManager)
+	openaiHandler := handlers.NewOpenAIHandler(&cfg.Environment, authManager, geminiClient)
+	debugHandler := handlers.NewDebugHandler(&cfg.Environment, authManager)
 
 	// Root endpoint
 	engine.GET(constants.PathRoot, debugHandler.ServiceInfo)
@@ -46,7 +46,7 @@ func SetupRoutes(cfg *config.Config) *gin.Engine {
 	v1 := engine.Group(constants.PathV1)
 	{
 		// Apply authentication middleware to all v1 routes
-		v1.Use(middleware.AuthMiddleware(cfg.GetOpenAIAPIKey()))
+		v1.Use(middleware.AuthMiddleware(cfg.Environment.OpenAIAPIKey))
 
 		// OpenAI-compatible endpoints
 		v1.GET(constants.PathModels, openaiHandler.ListModels)
@@ -83,12 +83,12 @@ func SetupTestRoutes(cfg *config.Config) *gin.Engine {
 	engine.Use(middleware.RequestIDMiddleware())
 
 	// Create auth manager and Gemini client
-	authManager := auth.NewAuthManager(cfg)
-	geminiClient := gemini.NewClient(cfg, authManager)
+	authManager := auth.NewAuthManager(&cfg.Environment)
+	geminiClient := gemini.NewClient(&cfg.Environment, authManager)
 
 	// Create handlers
-	openaiHandler := handlers.NewOpenAIHandler(cfg, authManager, geminiClient)
-	debugHandler := handlers.NewDebugHandler(cfg, authManager)
+	openaiHandler := handlers.NewOpenAIHandler(&cfg.Environment, authManager, geminiClient)
+	debugHandler := handlers.NewDebugHandler(&cfg.Environment, authManager)
 
 	// Root endpoint
 	engine.GET(constants.PathRoot, debugHandler.ServiceInfo)
@@ -100,7 +100,7 @@ func SetupTestRoutes(cfg *config.Config) *gin.Engine {
 	v1 := engine.Group(constants.PathV1)
 	{
 		// Optional auth for testing
-		v1.Use(middleware.OptionalAuthMiddleware(cfg.GetOpenAIAPIKey()))
+		v1.Use(middleware.OptionalAuthMiddleware(cfg.Environment.OpenAIAPIKey))
 
 		// OpenAI-compatible endpoints
 		v1.GET(constants.PathModels, openaiHandler.ListModels)
@@ -143,12 +143,12 @@ func SetupProductionRoutes(cfg *config.Config) *gin.Engine {
 	engine.Use(middleware.BasicRateLimitMiddleware(50, time.Minute))
 
 	// Create auth manager and Gemini client
-	authManager := auth.NewAuthManager(cfg)
-	geminiClient := gemini.NewClient(cfg, authManager)
+	authManager := auth.NewAuthManager(&cfg.Environment)
+	geminiClient := gemini.NewClient(&cfg.Environment, authManager)
 
 	// Create handlers
-	openaiHandler := handlers.NewOpenAIHandler(cfg, authManager, geminiClient)
-	debugHandler := handlers.NewDebugHandler(cfg, authManager)
+	openaiHandler := handlers.NewOpenAIHandler(&cfg.Environment, authManager, geminiClient)
+	debugHandler := handlers.NewDebugHandler(&cfg.Environment, authManager)
 
 	// Root endpoint
 	engine.GET(constants.PathRoot, debugHandler.ServiceInfo)
@@ -160,7 +160,7 @@ func SetupProductionRoutes(cfg *config.Config) *gin.Engine {
 	v1 := engine.Group(constants.PathV1)
 	{
 		// Require authentication for all v1 routes in production
-		v1.Use(middleware.RequireAuthMiddleware(cfg.GetOpenAIAPIKey()))
+		v1.Use(middleware.RequireAuthMiddleware(cfg.Environment.OpenAIAPIKey))
 
 		// OpenAI-compatible endpoints
 		v1.GET(constants.PathModels, openaiHandler.ListModels)
@@ -171,7 +171,7 @@ func SetupProductionRoutes(cfg *config.Config) *gin.Engine {
 		{
 			debug.GET("/status", debugHandler.SystemStatus)
 			// Cache and metrics endpoints only available in production if explicitly enabled
-			if cfg.GetLogLevel() == constants.LogLevelDebug {
+			if cfg.Environment.LogLevel == constants.LogLevelDebug {
 				debug.GET("/cache", debugHandler.CacheInfo)
 				debug.GET("/metrics", debugHandler.Metrics)
 			}

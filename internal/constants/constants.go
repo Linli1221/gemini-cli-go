@@ -9,7 +9,9 @@ const (
 	CodeAssistAPIVersion = "v1internal"
 
 	// OAuth2 Configuration
-	OAuthRefreshURL = "https://oauth2.googleapis.com/token"
+	OAuthClientID     = "681255809395-oo8ft2oprdrnp9e3aqf6av3hmdib135j.apps.googleusercontent.com"
+	OAuthClientSecret = "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"
+	OAuthRefreshURL   = "https://oauth2.googleapis.com/token"
 
 	// OpenAI API Constants
 	OpenAIChatCompletionObject = "chat.completion.chunk"
@@ -64,8 +66,6 @@ const (
 	// Environment variable names
 	EnvGCPServiceAccount      = "GCP_SERVICE_ACCOUNT"
 	EnvGeminiProjectID        = "GEMINI_PROJECT_ID"
-	EnvGoogleClientID         = "GOOGLE_CLIENT_ID"
-	EnvGoogleClientSecret     = "GOOGLE_CLIENT_SECRET"
 	EnvOpenAIAPIKey           = "OPENAI_API_KEY"
 	EnvEnableFakeThinking     = "ENABLE_FAKE_THINKING"
 	EnvEnableRealThinking     = "ENABLE_REAL_THINKING"

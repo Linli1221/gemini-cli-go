@@ -26,8 +26,6 @@ func New() (*Config, error) {
 		Environment: types.Environment{
 			GCPServiceAccount:       getEnv(constants.EnvGCPServiceAccount, ""),
 			GeminiProjectID:         getEnv(constants.EnvGeminiProjectID, ""),
-			GoogleClientID:          getEnv(constants.EnvGoogleClientID, ""),
-			GoogleClientSecret:      getEnv(constants.EnvGoogleClientSecret, ""),
 			OpenAIAPIKey:            getEnv(constants.EnvOpenAIAPIKey, ""),
 			EnableFakeThinking:      getEnv(constants.EnvEnableFakeThinking, "false"),
 			EnableRealThinking:      getEnv(constants.EnvEnableRealThinking, "false"),
@@ -121,16 +119,6 @@ func (c *Config) GetGeminiProjectID() string {
 // GetOpenAIAPIKey returns the OpenAI API key
 func (c *Config) GetOpenAIAPIKey() string {
 	return c.Environment.OpenAIAPIKey
-}
-
-// GetGoogleClientID returns the Google Client ID
-func (c *Config) GetGoogleClientID() string {
-	return c.Environment.GoogleClientID
-}
-
-// GetGoogleClientSecret returns the Google Client Secret
-func (c *Config) GetGoogleClientSecret() string {
-	return c.Environment.GoogleClientSecret
 }
 
 // Helper functions

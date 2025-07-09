@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"gemini-cli-go/internal/auth"
-	"gemini-cli-go/internal/config"
 	"gemini-cli-go/internal/constants"
 	"gemini-cli-go/internal/types"
 
@@ -15,11 +14,11 @@ import (
 // DebugHandler handles debug-related requests
 type DebugHandler struct {
 	authManager *auth.AuthManager
-	config      *config.Config
+	config      *types.Environment
 }
 
 // NewDebugHandler creates a new debug handler
-func NewDebugHandler(config *config.Config, authManager *auth.AuthManager) *DebugHandler {
+func NewDebugHandler(config *types.Environment, authManager *auth.AuthManager) *DebugHandler {
 	return &DebugHandler{
 		authManager: authManager,
 		config:      config,
@@ -74,11 +73,11 @@ func (h *DebugHandler) FullTest(c *gin.Context) {
 		"timestamp":      time.Now().UTC().Format(time.RFC3339),
 		"authentication": authStatus,
 		"configuration": map[string]interface{}{
-			"fake_thinking_enabled":       h.config.IsFakeThinkingEnabled(),
-			"real_thinking_enabled":       h.config.IsRealThinkingEnabled(),
-			"stream_thinking_as_content":  h.config.IsStreamThinkingAsContent(),
-			"api_key_required":           h.config.IsAuthRequired(),
-			"gemini_project_id_set":      h.config.GetGeminiProjectID() != "",
+			"fake_thinking_enabled":       h.config.EnableFakeThinking == "true",
+			"real_thinking_enabled":       h.config.EnableRealThinking == "true",
+			"stream_thinking_as_content":  h.config.StreamThinkingAsContent == "true",
+			"api_key_required":           h.config.OpenAIAPIKey != "",
+			"gemini_project_id_set":      h.config.GeminiProjectID != "",
 		},
 		"cache_info": h.authManager.GetCachedTokenInfo(),
 	}
@@ -107,7 +106,7 @@ func (h *DebugHandler) Health(c *gin.Context) {
 
 // ServiceInfo handles GET /
 func (h *DebugHandler) ServiceInfo(c *gin.Context) {
-	requiresAuth := h.config.IsAuthRequired()
+	requiresAuth := h.config.OpenAIAPIKey != ""
 
 	authType := "None"
 	if requiresAuth {
@@ -199,12 +198,12 @@ func (h *DebugHandler) SystemStatus(c *gin.Context) {
 			"cache_info": cacheInfo,
 		},
 		"configuration": map[string]interface{}{
-			"fake_thinking":              h.config.IsFakeThinkingEnabled(),
-			"real_thinking":              h.config.IsRealThinkingEnabled(),
-			"stream_thinking_as_content": h.config.IsStreamThinkingAsContent(),
-			"api_key_required":          h.config.IsAuthRequired(),
-			"project_id_configured":     h.config.GetGeminiProjectID() != "",
-			"gcp_credentials_provided":  h.config.GetGCPServiceAccount() != "",
+			"fake_thinking":              h.config.EnableFakeThinking == "true",
+			"real_thinking":              h.config.EnableRealThinking == "true",
+			"stream_thinking_as_content": h.config.StreamThinkingAsContent == "true",
+			"api_key_required":          h.config.OpenAIAPIKey != "",
+			"project_id_configured":     h.config.GeminiProjectID != "",
+			"gcp_credentials_provided":  h.config.GCPServiceAccount != "",
 		},
 	}
 
@@ -219,12 +218,12 @@ func (h *DebugHandler) SystemStatus(c *gin.Context) {
 // validateConfig validates the current configuration
 func (h *DebugHandler) validateConfig() bool {
 	// Check if required fields are set
-	if h.config.GetGCPServiceAccount() == "" {
+	if h.config.GCPServiceAccount == "" {
 		return false
 	}
 
 	// Check if port is valid
-	if h.config.GetAddress() == ":" {
+	if h.config.Port == "" {
 		return false
 	}
 

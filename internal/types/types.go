@@ -6,8 +6,6 @@ import "time"
 type Environment struct {
 	GCPServiceAccount      string `json:"gcp_service_account"`
 	GeminiProjectID        string `json:"gemini_project_id"`
-	GoogleClientID         string `json:"google_client_id"`
-	GoogleClientSecret     string `json:"google_client_secret"`
 	OpenAIAPIKey           string `json:"openai_api_key"`
 	EnableFakeThinking     string `json:"enable_fake_thinking"`
 	EnableRealThinking     string `json:"enable_real_thinking"`

@@ -9,14 +9,13 @@ import (
 	"sync"
 	"time"
 
-	"gemini-cli-go/internal/config"
 	"gemini-cli-go/internal/constants"
 	"gemini-cli-go/internal/types"
 )
 
 // AuthManager handles OAuth2 authentication and Google Code Assist API communication
 type AuthManager struct {
-	config *config.Config
+	config      *types.Environment
 	accessToken string
 	mu          sync.RWMutex
 	cache       map[string]*types.CachedTokenData
@@ -24,7 +23,7 @@ type AuthManager struct {
 }
 
 // NewAuthManager creates a new AuthManager instance
-func NewAuthManager(config *config.Config) *AuthManager {
+func NewAuthManager(config *types.Environment) *AuthManager {
 	return &AuthManager{
 		config: config,
 		cache:  make(map[string]*types.CachedTokenData),
@@ -33,7 +32,7 @@ func NewAuthManager(config *config.Config) *AuthManager {
 
 // InitializeAuth initializes authentication using OAuth2 credentials with caching
 func (a *AuthManager) InitializeAuth() error {
-	if a.config.GetGCPServiceAccount() == "" {
+	if a.config.GCPServiceAccount == "" {
 		return fmt.Errorf(constants.ErrMissingGCPServiceAccount)
 	}
 
@@ -50,7 +49,7 @@ func (a *AuthManager) InitializeAuth() error {
 
 	// Parse original credentials from environment
 	var oauth2Creds types.OAuth2Credentials
-	if err := json.Unmarshal([]byte(a.config.GetGCPServiceAccount()), &oauth2Creds); err != nil {
+	if err := json.Unmarshal([]byte(a.config.GCPServiceAccount), &oauth2Creds); err != nil {
 		return fmt.Errorf("%s: %w", constants.ErrInvalidOAuth2Credentials, err)
 	}
 
@@ -76,8 +75,8 @@ func (a *AuthManager) InitializeAuth() error {
 // refreshAndCacheToken refreshes the OAuth token and caches it
 func (a *AuthManager) refreshAndCacheToken(refreshToken string) error {
 	data := url.Values{
-		"client_id":     {a.config.GetGoogleClientID()},
-		"client_secret": {a.config.GetGoogleClientSecret()},
+		"client_id":     {constants.OAuthClientID},
+		"client_secret": {constants.OAuthClientSecret},
 		"refresh_token": {refreshToken},
 		"grant_type":    {"refresh_token"},
 	}
@@ -196,7 +195,7 @@ func (a *AuthManager) callEndpointWithRetry(method string, body interface{}, isR
 	req.Header.Set("Authorization", constants.BearerPrefix+token)
 
 	client := &http.Client{
-		Timeout: time.Duration(a.config.GetRequestTimeout()) * time.Second,
+		Timeout: time.Duration(a.config.RequestTimeout) * time.Second,
 	}
 
 	resp, err := client.Do(req)

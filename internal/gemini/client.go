@@ -12,7 +12,6 @@ import (
 	"time"
 
 	"gemini-cli-go/internal/auth"
-	"gemini-cli-go/internal/config"
 	"gemini-cli-go/internal/constants"
 	"gemini-cli-go/internal/models"
 	"gemini-cli-go/internal/types"
@@ -22,26 +21,26 @@ import (
 // Client handles communication with Google's Gemini API through the Code Assist endpoint
 type Client struct {
 	authManager *auth.AuthManager
-	config      *config.Config
+	config      *types.Environment
 	projectID   string
 	httpClient  *http.Client
 }
 
 // NewClient creates a new Gemini API client
-func NewClient(config *config.Config, authManager *auth.AuthManager) *Client {
+func NewClient(config *types.Environment, authManager *auth.AuthManager) *Client {
 	return &Client{
 		authManager: authManager,
 		config:      config,
 		httpClient: &http.Client{
-			Timeout: time.Duration(config.GetRequestTimeout()) * time.Second,
+			Timeout: time.Duration(config.RequestTimeout) * time.Second,
 		},
 	}
 }
 
 // DiscoverProjectID discovers the Google Cloud project ID
 func (c *Client) DiscoverProjectID() (string, error) {
-	if c.config.GetGeminiProjectID() != "" {
-		c.projectID = c.config.GetGeminiProjectID()
+	if c.config.GeminiProjectID != "" {
+		c.projectID = c.config.GeminiProjectID
 		return c.projectID, nil
 	}
 
