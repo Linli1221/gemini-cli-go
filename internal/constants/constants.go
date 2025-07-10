@@ -167,5 +167,5 @@ const (
 	AppName        = "Gemini CLI OpenAI Go"
 	AppDescription = "OpenAI-compatible API for Google Gemini models via OAuth"
 	AppVersion     = "1.0.0"
-	AppRepository  = "https://github.com/your-username/gemini-cli-go"
+	AppRepository  = "https://github.com/Linli1221/gemini-cli-go"
 )

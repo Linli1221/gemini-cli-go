@@ -1,0 +1,1 @@
+(Get-Content -Path "$env:USERPROFILE\.gemini\oauth_creds.json" -Raw) -replace '\s'

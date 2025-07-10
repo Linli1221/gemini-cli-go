@@ -31,7 +31,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/your-username/gemini-cli-go.git
+git clone https://github.com/Linli1221/gemini-cli-go.git
 cd gemini-cli-go
 
 # 安装依赖

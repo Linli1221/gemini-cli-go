@@ -3,6 +3,7 @@ package middleware
 import (
 	"bytes"
 	"fmt"
+	"gemini-cli-go/internal/config"
 	"io"
 	"log"
 	"strings"
@@ -32,8 +33,17 @@ func LoggingMiddleware() gin.HandlerFunc {
 }
 
 // RequestLoggingMiddleware logs detailed request information
-func RequestLoggingMiddleware() gin.HandlerFunc {
+func RequestLoggingMiddleware(cfg *config.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if cfg.GetLogLevel() != constants.LogLevelDebug {
+			c.Next()
+			return
+		}
+
+		// Create body log writer to capture response
+		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
+		c.Writer = blw
+
 		start := time.Now()
 		path := c.Request.URL.Path
 		raw := c.Request.URL.RawQuery
@@ -52,12 +62,22 @@ func RequestLoggingMiddleware() gin.HandlerFunc {
 		latency := time.Since(start)
 
 		// Log request details
-		logRequest(c, path, raw, bodyBytes, latency)
+		logRequest(c, path, raw, bodyBytes, blw.body.Bytes(), latency)
 	}
 }
 
+type bodyLogWriter struct {
+	gin.ResponseWriter
+	body *bytes.Buffer
+}
+
+func (w bodyLogWriter) Write(b []byte) (int, error) {
+	w.body.Write(b)
+	return w.ResponseWriter.Write(b)
+}
+
 // logRequest logs detailed request information
-func logRequest(c *gin.Context, path, raw string, bodyBytes []byte, latency time.Duration) {
+func logRequest(c *gin.Context, path, raw string, bodyBytes, responseBody []byte, latency time.Duration) {
 	clientIP := c.ClientIP()
 	method := c.Request.Method
 	statusCode := c.Writer.Status()
@@ -84,6 +104,15 @@ func logRequest(c *gin.Context, path, raw string, bodyBytes []byte, latency time
 			bodyStr = bodyStr[:1000] + "... (truncated)"
 		}
 		log.Printf("[REQUEST BODY] %s", bodyStr)
+	}
+
+	// Log response body
+	if len(responseBody) > 0 {
+		bodyStr := string(responseBody)
+		if len(bodyStr) > 1000 {
+			bodyStr = bodyStr[:1000] + "... (truncated)"
+		}
+		log.Printf("[RESPONSE BODY] %s", bodyStr)
 	}
 
 	// Log errors if any

@@ -20,6 +20,7 @@ func SetupRoutes(cfg *config.Config) *gin.Engine {
 
 	// Add global middleware
 	engine.Use(middleware.LoggingMiddleware())
+	engine.Use(middleware.RequestLoggingMiddleware(cfg))
 	engine.Use(middleware.CORSMiddleware())
 	engine.Use(middleware.SecurityHeadersMiddleware())
 	engine.Use(middleware.RequestIDMiddleware())
