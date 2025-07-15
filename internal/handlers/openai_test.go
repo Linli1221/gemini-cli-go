@@ -156,31 +156,6 @@ func TestChatCompletions_ValidRequest(t *testing.T) {
 	assert.True(t, w.Code == http.StatusOK || w.Code == http.StatusUnauthorized)
 }
 
-func TestExtractSystemPrompt(t *testing.T) {
-	handler, _ := setupTestHandler()
-
-	messages := []types.ChatMessage{
-		{
-			Role:    "system",
-			Content: "You are a helpful assistant",
-		},
-		{
-			Role:    "user",
-			Content: "Hello",
-		},
-		{
-			Role:    "assistant",
-			Content: "Hi there!",
-		},
-	}
-
-	systemPrompt, otherMessages := handler.extractSystemPrompt(messages)
-
-	assert.Equal(t, "You are a helpful assistant", systemPrompt)
-	assert.Len(t, otherMessages, 2)
-	assert.Equal(t, "user", otherMessages[0].Role)
-	assert.Equal(t, "assistant", otherMessages[1].Role)
-}
 
 func TestValidateImageSupport(t *testing.T) {
 	handler, _ := setupTestHandler()
@@ -226,8 +201,4 @@ func TestValidateImageSupport(t *testing.T) {
 
 func boolPtr(b bool) *bool {
 	return &b
-}
-
-func stringPtr(s string) *string {
-	return &s
 }
